@@ -98,7 +98,7 @@ def requesting(command, tsconn):
     r = requests.get(os.getenv('SPOTIFY_API_WEBSITE') + "api?command=" + command) #Send Command to API
     x = r.text
     if x[0] == "<":
-        tsconn.sendtextmessage(targetmode=2, target=1, msg="[color=red]Shits down[/red]")
+        tsconn.sendtextmessage(targetmode=2, target=1, msg="[color=red]Something is down[/red]")
     elif x == "ERROR_NO_VALID_AUTH_TOKENS":
         tsconn.sendtextmessage(targetmode=2, target=1, msg="[color=red]No valid auth tokens[/color]")
     else:
@@ -194,7 +194,7 @@ def startup():
         tsconn.auth(apikey=os.getenv('BOTS_TS3_AUTHKEY'))
         tsconn.use()
 
-        # Somehow it fucking works, don't ask
+        # Somehow it works, don't ask
         tsconn.sendtextmessage(targetmode=2, target=1, msg="Hello World!")
         try:
             tts.play("Hello world")
