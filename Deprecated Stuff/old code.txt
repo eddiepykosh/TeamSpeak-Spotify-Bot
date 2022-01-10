@@ -1,0 +1,74 @@
+###Functions for Votekick.  Have no real use so removed.  Place as def functions in TS3BotMain.py 
+
+def voting(tsconn): #voitng event answers are in votes.txt
+    os.system('python tsvotes.py')
+    tsconn.sendtextmessage(targetmode=2, target=1, msg="Voting has ended!")
+
+def results(): #read votes.txt and return amount of only yay votes (no double voting)
+    serverlog = open("votes.txt").readlines()
+    cleanServerLog = []
+    temp = []
+    for i in range(len(serverlog)): #cleans Server log
+        temp = serverlog[i].rsplit(' ')
+        temp = serverlog[i].rsplit()
+        temp =" ".join(temp[1::])
+        cleanServerLog.append(temp)
+    #print(cleanServerLog)
+    logsDict = {}
+    for j in range(len(cleanServerLog)): #creates a dictonary of users name and if they voted yes
+        if '!yes' in cleanServerLog[j]:
+            #print('adding...')
+            temp2 = cleanServerLog[j].rsplit(':')
+            temp2[1] = temp2[1].lstrip()
+            #print(temp2)
+            logsDict[temp2[0]] =temp2[1]
+        else:
+            continue
+    print(logsDict)
+    yayAmount = len(logsDict)
+    print(str(yayAmount))
+    return yayAmount
+
+
+
+####Vote kick function. Was poorly written so removed.  To reactivate, place as an elif in the def startup()
+
+
+                elif command[0] == 'votekick' and len(command) > 1:
+                    currentMembers = getMembers()
+                    votedUserCommand = " ".join(command[1::])
+
+                    userSearchTuple = userSearch(currentMembers, votedUserCommand)  # searches for a user
+                    if userSearchTuple[0]:  # checks if successful
+                        userExists = True
+                        userLocationinDict = userSearchTuple[1]
+                    else:
+                        userExists = False
+
+                    if userExists:
+                        print("User found!")
+                        tsconn.sendtextmessage(targetmode=2, target=1, msg="Uh oh, vote kick time!")
+                        channelID = int(currentMembers[userLocationinDict].get('cid'))  # Get Channel ID
+                        clientID = int(currentMembers[userLocationinDict].get('clid'))
+                        print(channelID)
+                        membersInChannel = channelMembers(currentMembers,
+                                                          channelID)  # counts members in channel EXCLUDING BOTS and how many are here
+                        votingMajority = (int(membersInChannel / 2) + 1)
+                        tsconn.sendtextmessage(targetmode=2, target=1, msg="There are " +
+                                                                           str(
+                                                                               membersInChannel) + " people in this channel (bots do not count).  "
+                                                                                                   "You need " + str(
+                            votingMajority) + " votes of '!yes' to kick " + votedUserCommand + " out.  You have 15 seconds")
+                        # Voting Event creates votes.txt
+                        voting(tsconn)
+                        yayVotes = results()  # gives us yay votes
+                        print(clientID)
+                        if yayVotes >= votingMajority:
+                            tsconn.sendtextmessage(targetmode=2, target=1, msg='Bye ' + votedUserCommand + '!')
+                            tsconn.clientkick(reasonid=4, reasonmsg="You've been Vote Kicked!", clid=clientID)
+                        else:
+                            tsconn.sendtextmessage(targetmode=2, target=1,
+                                                   msg=votedUserCommand + " will not be kicked.")
+
+                    else:
+                        tsconn.sendtextmessage(targetmode=2, target=1, msg="User does not exist!")

@@ -1,0 +1,34 @@
+From when VoteKick was used.  Votekick was removed because it was poorly written but these functions could be useful for something else
+
+
+def getMembers(): #gets all members of the teamspeak who are not away.  Only called when doing a votekick which is deprecated.  Could have some future use so it can stay
+    with ts3.query.TS3ServerConnection(os.getenv('TS3_SERVER_IP')) as tsServer:
+        tsServer.login(client_login_name=os.getenv('TS3_SERVER_ADMIN_NAME'), client_login_password=os.getenv('TS3_SERVER_ADMIN_PASSWORD'))
+        tsServer.use(sid=1)
+        members = tsServer.clientlist(ip=True)
+        return members
+        tsServer.close()
+
+def userSearch(currentMembers, votedUserCommand): #it will return a true or false statement and the usersLocation.  Only called when doing a votekick which is deprecated.  Could have some future use so it can stay
+    userexists = False
+    userlocationindict = 0
+    for x in range(len(currentMembers)):
+        if currentMembers[x].get('client_nickname').startswith(votedUserCommand):
+            userexists = True
+            userlocationindict = x
+            break
+        else:
+            continue
+    return userexists, userlocationindict
+
+def channelMembers(currentMembers, channelID): #returns how many people are in the speficied channel.  Requires currentMembers and the channelID. Only called when doing a votekick which is deprecated.  Could have some future use so it can stay
+    membersInChannel = 0
+    for x in range(len(currentMembers)):
+        if (int(currentMembers[x].get('cid')) == channelID) and (
+                (int(currentMembers[x].get('client_database_id')) != 104) and 
+                (int(currentMembers[x].get('client_database_id')) != 118)): #104 and 118 Denote bot IDs
+            membersInChannel += 1
+        else:
+            continue
+    return membersInChannel
+
